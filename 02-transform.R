@@ -24,10 +24,20 @@ dt[, threadname := gsub("(\\d*@facebook.com|Ond.ej Zacha)",
                         "", threadname)]
 dt[, threadname := gsub("\n\n*", 
                         "\n", threadname)]
-# dt[, threadname := gsub("(1445006818@facebook.com|Ond.ej Zacha)", 
-#                         "", threadname)]
+
+dt[, thread := gsub("@facebook.com", "", thread)]
+
+# for filtering
+dt[, plus1000 := .N > 1000L, by = thread]  # 43 threads
+dt[, plus5000 := .N > 5000L, by = thread]  # 15 threads
+
+dt[, realday := as.Date(time - 3600 * 6)]  # because it's not tomorrow yet if i don't go to sleep
+
+dt[, by_me := grepl("(1445006818@facebook.com|Ond.ej.Zacha)", user)]
 
 
-dt[, thread2 := ifelse(.N > 1000L, thread, "others"), by = thread]
-dt[, thread5000 := ifelse(.N > 5000L, thread, "others"), by = thread]
+dt[, meta := NULL]
+
+dt[grepl("\n", message)]
+
 
