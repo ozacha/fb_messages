@@ -3,6 +3,8 @@ library(data.table)
 
 load("messages_dt.RData")
 
+dt[, id := .N:1L, by = thread]  # add index for ordering (minutes are not enough)
+# setkey(dt, thread, id)
 
 # time --------------------------------------------------------------------
 # to ensure the date parsing works

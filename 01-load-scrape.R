@@ -1,5 +1,4 @@
 library(data.table)
-library(XML)
 library(rvest)
 library(magrittr)
 
@@ -25,7 +24,7 @@ dt <- data.table(thread = thread_names_full,
                  user = users,
                  message = texts)
 
-save(dt, file = "messages_dt.RData")
+# save(dt, file = "messages_dt.RData")
 
 
 

@@ -67,3 +67,42 @@ ggplot(dt[plus1000 == T],
   geom_bar(position = "fill", stat = "count") +
   geom_hline(yintercept = 0.5, linetype = "dashed") +
   theme(axis.text = element_text(size = 7, angle = 65, hjust = 1))
+
+# ... in time (not that relevant)
+ggplot(dt[plus5000 == T],
+       aes(x = year(time), fill = by_me)) +
+  geom_bar(position = "fill", stat = "count") +
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
+  theme(axis.text = element_text(size = 7, angle = 65, hjust = 1)) +
+  facet_wrap(~threadname)
+
+# who usually writes the first message
+ggplot(dt[plus5000 == T,
+          .(by_me = .SD[id == min(id), by_me]),
+          by = .(threadname, realday)],
+       aes(x = threadname, fill = by_me)) +
+  geom_bar(position = "fill", stat = "count") +
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
+  theme(axis.text = element_text(size = 7, angle = 65, hjust = 1))
+
+# ...in time
+ggplot(dt[plus5000 == T,
+          .(by_me = .SD[id == min(id), by_me]),
+          by = .(threadname, realday)],
+       aes(x = year(realday), fill = by_me)) +
+  geom_bar(position = "fill", stat = "count") +
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
+  theme(axis.text = element_text(size = 7, angle = 65, hjust = 1)) +
+  facet_wrap(~threadname) +
+  ggtitle("Who messages first?")
+
+# last message?
+ggplot(dt[plus5000 == T,
+          .(by_me = .SD[id == max(id), by_me]),
+          by = .(threadname, realday)],
+       aes(x = year(realday), fill = by_me)) +
+  geom_bar(position = "fill", stat = "count") +
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
+  theme(axis.text = element_text(size = 7, angle = 65, hjust = 1)) +
+  facet_wrap(~threadname) + 
+  ggtitle("Who messages last?")
