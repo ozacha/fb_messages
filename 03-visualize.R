@@ -106,3 +106,32 @@ ggplot(dt[plus5000 == T,
   theme(axis.text = element_text(size = 7, angle = 65, hjust = 1)) +
   facet_wrap(~threadname) + 
   ggtitle("Who messages last?")
+
+# ggplot(dt[plus5000 == T & !(is.na(response_delay))],
+#        aes(x = time, y = response_delay, color = user)) +
+#   geom_point() +
+#   facet_wrap(~threadname, scales = "free") + 
+#   scale_fill_discrete(guide = F)
+
+# average response time
+ggplot(dt[plus5000 == T & !(is.na(response_delay)) & time > "2011-04-01",
+          .(response_delay = mean(response_delay, trim = 0.05), date = as.Date(min(time))), 
+          by = .(year(time), 
+                 month(time),
+                 by_me)],
+       aes(x = date, y = abs(response_delay), color = by_me, fill = by_me)) +
+  geom_point() +
+  xlab("Date") + ylab("Average response delay (mins)")
+
+# ...per thread
+ggplot(dt[plus5000 == T & !(is.na(response_delay)),
+          .(response_delay = mean(response_delay, trim = 0.05), date = as.Date(min(time))), 
+          by = .(year(time), 
+                 month(time),
+                 by_me,
+                 threadname)],
+       aes(x = date, y = abs(response_delay), color = by_me, fill = by_me)) +
+  geom_point() +
+  facet_wrap(~threadname) + 
+  scale_y_log10() +
+  xlab("Date") + ylab("Average response delay (mins)") 

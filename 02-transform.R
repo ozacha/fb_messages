@@ -22,10 +22,10 @@ dt[, threadname := paste0(unique(user), collapse = "\n"),
    by = thread]
 dt[, threadname := gsub("(\\d*@facebook.com|Ond.ej Zacha)", 
                         "", threadname)]
-dt[, threadname := gsub("\n\n*", "\n", threadname)]
+dt[, threadname := gsub("\n(\n)*", "\n", threadname)]
 dt[, threadname := gsub("(^\n|\n$)", "", threadname)]
-dt[str_count(threadname, "\n") > 3, 
-   threadname := str_sub(threadname, 1L, 30L)]
+# dt[str_count(threadname, "\n") > 3, 
+#    threadname := str_sub(threadname, 1L, 30L)]
 
 
 dt[, thread := gsub("@facebook.com", "", thread)]
@@ -38,9 +38,11 @@ dt[, by_me := grepl("(1445006818@facebook.com|Ond.ej.Zacha)", user)]
 
 # response delay ----------------------------------------------------------
 setkey(dt, thread, time, id)
-dt[, response_delay := NA_real_]
-dt[user != shift(user) & id > 1,
-   response_delay := difftime(time, shift(time), units = "min")]
+dt[, response_delay := ifelse(user != shift(user) & time > min(time),
+                              difftime(time, shift(time), units = "min"),
+                              NA_real_),
+   by = .(thread, realday)]  # or just thread (doesn't exclude first message each day)
+# dt[by_me == T & !(is.na(response_delay)), response_delay := -response_delay]
 # ???
 
 
