@@ -18,7 +18,7 @@ dt[, meta := NULL]
 # thread info -------------------------------------------------------------
 dt[, threadname := paste0(unique(user), collapse = "\n"),
    by = thread]
-dt[, threadname := gsub("(\\d*@facebook.com|Ond.ej Zacha)", 
+dt[, threadname := gsub(paste0("(\\d*@facebook.com|", name_regex, ")"), 
                         "", threadname)]
 dt[, threadname := gsub("\n(\n)*", "\n", threadname)]
 dt[, threadname := gsub("(^\n|\n$)", "", threadname)]
@@ -38,7 +38,7 @@ dt[, realday := as.Date(time - 3600 * 6)]  # because it's not tomorrow yet if i 
 
 dt[, plus1000 := .N > 1000L, by = thread]  # 43 threads
 dt[, plus5000 := .N > 5000L, by = thread]  # 15 threads
-dt[, by_me := grepl("(1445006818@facebook.com|Ond.ej.Zacha)", user)]
+dt[, by_me := grepl(paste0("(", fb_id, "@facebook.com|", name_regex, ")"), user)]
 
 
 # response delay ----------------------------------------------------------

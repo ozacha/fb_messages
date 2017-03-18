@@ -2,12 +2,17 @@ library(data.table)
 library(rvest)
 library(magrittr)
 
+fb_id <- "1445006818"
+name_regex <- "Ond.ej Zacha"
+
+
 HTM <- read_html("data/messages.htm", encoding = "UTF-8")
 
 thread_divs <- html_nodes(HTM, "div.thread")
 thread_text <- html_text(thread_divs)
 
-thread_names <- gsub("(^\\d*@facebook.com), 1445006818@facebook.com.*", "\\1", thread_text)
+thread_names <- gsub(paste0("(^\\d*@facebook.com), ", fb_id, "@facebook.com.*$"),
+                     "\\1", thread_text)
 # thread_names <- gsub("(^\\d*@facebook.com, \\d*@facebook.com).*", "\\1", thread_text)
 thread_lengths <- unlist(lapply(thread_divs, function(x) length(html_nodes(x, "span.user"))))
 
