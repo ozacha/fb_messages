@@ -14,8 +14,6 @@ dt[, time := parse_date_time(gsub("(^[a-zA-Z]*, |at | UTC\\+0[12]*)", "", meta),
 dt[str_sub(meta, -1L, -1L) == "2", time := time - 3600]
 dt[, meta := NULL]
 
-dt[, realday := as.Date(time - 3600 * 6)]  # because it's not tomorrow yet if i don't go to sleep
-
 
 # thread info -------------------------------------------------------------
 dt[, threadname := paste0(unique(user), collapse = "\n"),
@@ -27,10 +25,17 @@ dt[, threadname := gsub("(^\n|\n$)", "", threadname)]
 # dt[str_count(threadname, "\n") > 3, 
 #    threadname := str_sub(threadname, 1L, 30L)]
 
-
 dt[, thread := gsub("@facebook.com", "", thread)]
+dt[, thread := paste0("fb_", thread)]
+
+setcolorder(dt, c("thread", "threadname", "id", "time", "user", "message"))
+
+dt <- rbindlist(list(dt, wa_dt))
 
 # for filtering -----------------------------------------------------------
+dt[, realday := as.Date(time - 3600 * 6)]  # because it's not tomorrow yet if i don't go to sleep
+
+
 dt[, plus1000 := .N > 1000L, by = thread]  # 43 threads
 dt[, plus5000 := .N > 5000L, by = thread]  # 15 threads
 dt[, by_me := grepl("(1445006818@facebook.com|Ond.ej.Zacha)", user)]

@@ -28,18 +28,3 @@ dt <- data.table(thread = thread_names_full,
 
 
 # ---------------------------------
-
-library(stringr)
-wa <- data.table(meta = readLines("data/WhatsApp Chat with COOL KIDS.txt")) #, encoding = "Unicode")
-wa[, messageid := cumsum(str_detect(meta, "^\\d+/\\d+/\\d+, \\d+:\\d+"))]
-wa <- wa[, .(meta = paste0(meta, collapse = " ")), by = messageid]
-wa[, timestamp := str_sub(meta, 1L, str_locate(meta, "\\d - ")[,1])]
-wa[, user := str_sub(meta, 
-                     str_locate(meta, "\\d - ")[,2],
-                     str_locate(meta, ": ")[,1] - 1)]
-wa[, message := ifelse(is.na(user),
-                       str_sub(meta, 
-                               str_locate(meta, "\\d - ")[,2], -1L),
-                       str_sub(meta, 
-                               str_locate(meta, ": ")[,2], -1L))]
-wa[, meta := NULL]
