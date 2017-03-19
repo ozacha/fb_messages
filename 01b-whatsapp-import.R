@@ -1,6 +1,3 @@
-library(stringr)
-library(data.table)
-
 wa_files <- list.files("data", pattern = "WhatsApp Chat with .*\\.txt")
 wa_dt <- data.table()
 

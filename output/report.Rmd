@@ -1,17 +1,37 @@
-# total messages by week
-ggplot(dt[plus5000 == T, 
+---
+title: "Messages visualized"
+output:
+  html_document:
+    theme: flatly
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(data.table)
+load("../messages_dt_final.RData")
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      message = FALSE,
+                      fig.width = 10,
+                      fig.height = 7)
+```
+
+## total messages by week
+```{r}
+ggplot2::ggplot(dt[plus5000 == T, 
           .(.N, date = as.Date(min(time))), 
           by = .(year(time), 
                  week(time), 
                  threadname)],
        aes(x = date, y = N, color = threadname, fill = threadname)) +
   geom_bar(stat = "identity", position = "stack") +
-  # scale_color_discrete(guide = FALSE) + 
   theme(legend.text = element_text(size = 6),
         legend.key.size = unit(2, "mm"),
         legend.spacing = unit(1, "mm"))
+```
 
-# messages by week & thread
+## messages by week & thread
+```{r}
 ggplot(dt[plus5000 == T, 
           .(.N, date = as.Date(min(time))), 
           by = .(year(time), 
@@ -22,35 +42,18 @@ ggplot(dt[plus5000 == T,
   scale_color_discrete(guide = FALSE) + 
   scale_fill_discrete(guide = FALSE) + 
   facet_wrap(~threadname, scales = "free_y")
+```
 
-# after midnight
-ggplot(dt[plus5000 == T & hour(time) %between% list(0, 5) & time > '2012-01-01', 
-          .(.N, date = as.Date(min(time))), 
-          by = .(year(time), 
-                 week(time), 
-                 threadname)],
-       aes(x = date, y = N, color = threadname, fill = threadname)) +
-  geom_bar(stat = "identity", position = "stack") +
-  # scale_color_discrete(guide = FALSE) + 
-  theme(legend.text = element_text(size = 6),
-        legend.key.size = unit(2, "mm"),
-        legend.spacing = unit(1, "mm"))
-
-# message length distribution
-ggplot(dt[nchar(message) < 40000],
-       aes(x = nchar(message))) +
-  geom_histogram(bins = 100) +
-  scale_x_sqrt(breaks = c(10, 20, 50, 100, 500, 1000), 
-               labels = scales::comma, 
-               limits = c(0, 1000))
-
-# messages distribution by time
+## messages distribution by time
+```{r}
 ggplot(dt[plus5000 == T],
        aes(x = hour(time), fill = threadname)) +
   geom_histogram(bins = 24) +
   facet_wrap(~threadname, scales = "free_y")
+```
 
-# last message before going to bed
+## last message before going to bed
+```{r}
 ggplot(dt[by_me == T,
           .(lastmessage = max(difftime(time, as.POSIXct(realday), units = "hours"))), 
           by = realday],
@@ -58,32 +61,19 @@ ggplot(dt[by_me == T,
   geom_point(alpha = 0.5) +
   geom_hline(yintercept = 24) +
   scale_y_continuous(labels = function(x) paste0(x %% 24, ":00"))
+```
 
-# proportion of messages written by me
+## proportion of messages written by me
+```{r}
 ggplot(dt[plus1000 == T],
        aes(x = threadname, fill = by_me)) +
   geom_bar(position = "fill", stat = "count") +
   geom_hline(yintercept = 0.5, linetype = "dashed") +
   theme(axis.text = element_text(size = 7, angle = 65, hjust = 1))
+```
 
-# ... in time (not that relevant)
-ggplot(dt[plus5000 == T],
-       aes(x = year(time), fill = by_me)) +
-  geom_bar(position = "fill", stat = "count") +
-  geom_hline(yintercept = 0.5, linetype = "dashed") +
-  theme(axis.text = element_text(size = 7, angle = 65, hjust = 1)) +
-  facet_wrap(~threadname)
-
-# who usually writes the first message
-ggplot(dt[plus5000 == T,
-          .(by_me = .SD[id == min(id), by_me]),
-          by = .(threadname, realday)],
-       aes(x = threadname, fill = by_me)) +
-  geom_bar(position = "fill", stat = "count") +
-  geom_hline(yintercept = 0.5, linetype = "dashed") +
-  theme(axis.text = element_text(size = 7, angle = 65, hjust = 1))
-
-# ...in time
+## who usually writes the first message
+```{r}
 ggplot(dt[plus5000 == T,
           .(by_me = .SD[id == min(id), by_me]),
           by = .(threadname, realday)],
@@ -93,8 +83,10 @@ ggplot(dt[plus5000 == T,
   theme(axis.text = element_text(size = 7, angle = 65, hjust = 1)) +
   facet_wrap(~threadname) +
   ggtitle("Who messages first?")
+```
 
-# last message?
+## ... and the last message?
+```{r}
 ggplot(dt[plus5000 == T,
           .(by_me = .SD[id == max(id), by_me]),
           by = .(threadname, realday)],
@@ -104,14 +96,10 @@ ggplot(dt[plus5000 == T,
   theme(axis.text = element_text(size = 7, angle = 65, hjust = 1)) +
   facet_wrap(~threadname) + 
   ggtitle("Who messages last?")
+```
 
-# ggplot(dt[plus5000 == T & !(is.na(response_delay))],
-#        aes(x = time, y = response_delay, color = user)) +
-#   geom_point() +
-#   facet_wrap(~threadname, scales = "free") + 
-#   scale_fill_discrete(guide = F)
-
-# average response time
+## average response time
+```{r}
 ggplot(dt[plus5000 == T & !(is.na(response_delay)) & time > "2011-04-01",
           .(response_delay = mean(response_delay, trim = 0.05), date = as.Date(min(time))), 
           by = .(year(time), 
@@ -120,8 +108,10 @@ ggplot(dt[plus5000 == T & !(is.na(response_delay)) & time > "2011-04-01",
        aes(x = date, y = abs(response_delay), color = by_me, fill = by_me)) +
   geom_point() +
   xlab("Date") + ylab("Average response delay (mins)")
+```
 
-# ...per thread
+## ...per thread
+```{r}
 ggplot(dt[plus5000 == T & !(is.na(response_delay)),
           .(response_delay = mean(response_delay, trim = 0.05), date = as.Date(min(time))), 
           by = .(year(time), 
@@ -133,3 +123,5 @@ ggplot(dt[plus5000 == T & !(is.na(response_delay)),
   facet_wrap(~threadname) + 
   scale_y_log10() +
   xlab("Date") + ylab("Average response delay (mins)") 
+
+```
