@@ -14,4 +14,5 @@ source("01b-whatsapp-import.R")
 source("02-transform.R")
 # source("03-visualize.R")
 
-knitr::knit("output/report.Rmd")
+rmarkdown::render("output/report.Rmd")
+if (interactive()) browseURL("output/report.html")

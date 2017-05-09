@@ -23,6 +23,15 @@ ggplot(dt[plus5000 == T,
   scale_fill_discrete(guide = FALSE) + 
   facet_wrap(~threadname, scales = "free_y")
 
+# dt[plus5000 == T, 
+#           .(.N, date = as.Date(min(time))), 
+#           by = .(year(time), 
+#                  week(time), 
+#                  threadname)][
+#                    , .(threadname = .SD[N == max(N), threadname]), 
+#                    by = .(year, week, date)]
+
+
 # after midnight
 ggplot(dt[plus5000 == T & hour(time) %between% list(0, 5) & time > '2012-01-01', 
           .(.N, date = as.Date(min(time))), 
